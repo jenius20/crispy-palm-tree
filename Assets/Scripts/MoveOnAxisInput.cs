@@ -4,37 +4,67 @@ using UnityEngine;
 
 public class MoveOnAxisInput : MonoBehaviour
 {
+    public Rigidbody rb;
 
+    public float floatDistance = 1.0f;
     public string horizontalAxis = "Horizontal";
     public string verticalAxis = "Vertical";
     public float speed = 1.0f;
-    public LayerMask layerMask = -1;
+    private Transform m_Cam;                  // A reference to the main camera in the scenes transform
+    private Vector3 m_CamForward;             // The current forward direction of the camera
+    private Vector3 m_Move;
+    public float rotSpeed = 1.0f;
+    public Transform myCameraTransform;
+    private Vector3 lookDirection;
+    private Vector3 normal;
 
-	void Start ()
+    void Start()
     {
-		
-	}
-	
-	// Update is called once per frame
-	void Update ()
+        rb = GetComponent<Rigidbody>();
+        m_Cam = Camera.main.transform;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        m_Move = (v * transform.forward);
+
+
+
+    }
+    private void FixedUpdate()
     {
 
-        Vector3 moveDirection = (Vector3.right * Input.GetAxis(horizontalAxis) + Vector3.forward * Input.GetAxis(verticalAxis)).normalized * speed * Time.deltaTime;
+
 
         RaycastHit hit;
-        if(Physics.Raycast(transform.position, moveDirection,out hit, 1.0f,layerMask))
+        Physics.Raycast(transform.position+new Vector3(0.0f,0.5f,0.0f), -transform.up, out hit);
+        if (Physics.Raycast(transform.position + new Vector3(0.0f, 0.5f, 0.0f), -transform.up, 2))
         {
-            Vector3 tangent = Vector3.Cross(Vector3.Cross(hit.normal, moveDirection), hit.normal).normalized;
-            if (!Physics.Raycast(transform.position, tangent, 1.0f,layerMask))
-            {
-                transform.position += tangent * speed * Time.deltaTime;
-            }
 
+            normal = hit.normal;
+
+            transform.up = normal;
         }
-        else
+        if (hit.distance > floatDistance)
         {
-            transform.position += moveDirection;
+            rb.AddForce(-transform.up * 50);
         }
 
-	}
+
+        m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
+
+        lookDirection = Vector3.ProjectOnPlane(m_CamForward,normal);
+        Debug.DrawRay(hit.point, lookDirection);
+        transform.forward = lookDirection;
+       // transform.up = normal;
+
+
+        rb.MovePosition(transform.position + m_Move*speed*Time.deltaTime);
+        
+
+    }
 }

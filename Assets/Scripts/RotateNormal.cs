@@ -3,20 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RotateNormal : MonoBehaviour {
+    private Vector3 hitr;
 
-    void FixedUpdate()
+    void Update()
     {
         RaycastHit hit;
-
-
-        //cast a ray down in the world from our current position
-        if (Physics.Raycast(transform.position, -Vector3.up, out hit))
+        Physics.Raycast(transform.position, Vector3.down, out hit);
+        if (Physics.Raycast(transform.position, Vector3.down, 2))
         {
-            //sets the rotation so the x-axis aligns to the normal of the surface beneath us
-            //this aligns the x to the surface's outward direction not the surface's x-axis
-            transform.rotation = Quaternion.FromToRotation(Vector3.right, hit.normal);
-
+            transform.up = hit.normal;
         }
-
     }
 }

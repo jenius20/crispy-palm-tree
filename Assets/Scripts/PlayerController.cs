@@ -6,6 +6,9 @@ public class PlayerController : MonoBehaviour
 {
     public Animator anim;
 
+    private float inputH;
+    private float inputV;
+
 	// Use this for initialization
 	void Start ()
     {
@@ -35,25 +38,31 @@ public class PlayerController : MonoBehaviour
         }
 
         
-        if (Input.GetKeyDown("4"))
+        if (Input.GetKeyDown("2"))
         {
             anim.Play("AntHurt", -1, 0f);
         }
-        if (Input.GetKeyDown("5"))
+        if (Input.GetKeyDown("3"))
         {
             anim.Play("AntAttack0", -1, 0f);
         }
-        if (Input.GetKeyDown("6"))
+        if (Input.GetKeyDown("4"))
         {
             anim.Play("AntAttack01", -1, 0f);
         }
-        if (Input.GetKeyDown("7"))
+        if (Input.GetKeyDown("5"))
         {
             anim.Play("AntAttack02", -1, 0f);
         }
-        if (Input.GetKeyDown("8"))
+        if (Input.GetKeyDown("6"))
         {
             anim.Play("AntWalk", -1, 0f);
         }
+
+        inputH = Input.GetAxis("Horizontal");
+        inputV = Input.GetAxis("Vertical");
+
+        anim.SetFloat("inputH", inputH);
+        anim.SetFloat("inputV", inputV);
     }
 }

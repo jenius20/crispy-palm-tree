@@ -17,6 +17,9 @@ public class MoveOnAxisInput : MonoBehaviour
     public Transform myCameraTransform;
     private Vector3 lookDirection;
     private Vector3 normal;
+    public float damping = 1.0f;
+    private float angle;
+    private Vector3 normalForward;
 
     void Start()
     {
@@ -38,30 +41,59 @@ public class MoveOnAxisInput : MonoBehaviour
     private void FixedUpdate()
     {
 
+        RaycastHit hitForward;
 
-
+        if(Physics.Raycast(transform.position + new Vector3(0.0f, 0.5f, 0.0f), transform.forward, out hitForward, 2))
+        {
+            normalForward = hitForward.normal;
+        }
+        Debug.DrawRay(transform.position + new Vector3(0.0f, 0.5f, 0.0f), transform.forward, Color.red);
         RaycastHit hit;
-        Physics.Raycast(transform.position+new Vector3(0.0f,0.5f,0.0f), -transform.up, out hit);
-        if (Physics.Raycast(transform.position + new Vector3(0.0f, 0.5f, 0.0f), -transform.up, 2))
+
+        if (Physics.Raycast(transform.position + new Vector3(0.0f, 0.5f, 0.0f), -transform.up,out hit, 2))
         {
 
             normal = hit.normal;
 
-            transform.up = normal;
+          //  transform.position = hit.point;
         }
+        Debug.DrawRay(transform.position + new Vector3(0.0f, 0.5f, 0.0f), -transform.up, Color.red);
         if (hit.distance > floatDistance)
         {
-            rb.AddForce(-transform.up * 50);
+            rb.AddForce(-transform.up * 500);
         }
 
 
+
+        Debug.DrawRay(hit.point, Vector3.ProjectOnPlane(transform.right, hit.normal), Color.blue);
+   /*    
+        if(hitForward.distance < hit.distance)
+        {
+            lookDirection = Vector3.ProjectOnPlane(m_CamForward, normalForward);
+            angle = Vector3.Angle(transform.right, Vector3.ProjectOnPlane(transform.right, hitForward.normal));
+        }
+        else
+        {
+            lookDirection = Vector3.ProjectOnPlane(m_CamForward, normal);
+            angle = Vector3.Angle(transform.right, Vector3.ProjectOnPlane(transform.right, hit.normal));
+        } */
         m_CamForward = Vector3.Scale(m_Cam.forward, new Vector3(1, 0, 1)).normalized;
-
+        
         lookDirection = Vector3.ProjectOnPlane(m_CamForward,normal);
-        Debug.DrawRay(hit.point, lookDirection);
-        transform.forward = lookDirection;
-       // transform.up = normal;
+        Debug.DrawRay(hit.point, lookDirection, Color.yellow);
 
+        transform.forward = lookDirection;
+        angle = Vector3.Angle(transform.right, Vector3.ProjectOnPlane(transform.right, hit.normal));
+        Debug.Log(angle);
+        Debug.Log(transform.eulerAngles.y);
+        if(transform.eulerAngles.y > 0.0f && transform.eulerAngles.y < 180.0f)
+        {
+            transform.Rotate(0, 0, -angle);
+        }
+        else
+        {
+            transform.Rotate(0, 0, angle);
+        }
 
         rb.MovePosition(transform.position + m_Move*speed*Time.deltaTime);
         

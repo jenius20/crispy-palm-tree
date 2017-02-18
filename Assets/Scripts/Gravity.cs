@@ -49,6 +49,9 @@ public class Gravity : MonoBehaviour
 
     private void Update()
     {
+        anim.SetFloat("RunMultiplier", (moveSpeed)/1.5f);
+
+
         if(Input.GetAxis("Vertical") != 0)
         {
             anim.SetBool("IsWalking", true);

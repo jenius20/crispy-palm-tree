@@ -44,6 +44,7 @@ public class Gravity : MonoBehaviour
     private void FixedUpdate()
     {
         // apply constant weight force according to character normal:
+        
         GetComponent<Rigidbody>().AddForce(-gravity * GetComponent<Rigidbody>().mass * myNormal);
     }
 
@@ -71,13 +72,14 @@ public class Gravity : MonoBehaviour
         if (Input.GetButtonDown("Jump"))
         { // jump pressed:
             Debug.Log("jumped");
-            ray = new Ray(myTransform.position, myTransform.forward);
+            ray = new Ray(myTransform.position, myTransform.up);
             if (Physics.Raycast(ray, out hit, jumpRange))
             { // wall ahead?
                 JumpToWall(hit.point, hit.normal); // yes: jump to the wall
             }
             else if (isGrounded)
             { // no: if grounded, jump up
+
                 GetComponent<Rigidbody>().velocity += jumpSpeed * myNormal;
             }
         }
@@ -89,7 +91,14 @@ public class Gravity : MonoBehaviour
         if (Physics.Raycast(ray, out hit))
         { // use it to update myNormal and isGrounded
             isGrounded = hit.distance <= distGround + deltaGround;
-            surfaceNormal = hit.normal;
+            if (isGrounded)
+            {
+                surfaceNormal = hit.normal;
+            }
+            else
+            {
+                surfaceNormal = Vector3.up;
+            }
         }
         else
         {
